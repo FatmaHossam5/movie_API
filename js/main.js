@@ -28,7 +28,7 @@ getMovies("movie/now_playing");
   let result= await response.json();
   movies=result.results;
   displayMovies();
-  search();
+ 
 }
 
 function displayMovies(){
@@ -76,7 +76,7 @@ function search(term){
   
   var cartoona="";
   for(var i=0;i<movies.length;i++){
-      if(movies[i].title.toLowerCase().includes(term.toLowerCase())==true)
+      if(movies[i]?.title.toLowerCase().includes(term.toLowerCase())==true)
       {
       cartoona += `
       <div class="col-md-6 col-lg-4 my-3 px-3">
