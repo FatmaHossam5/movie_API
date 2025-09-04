@@ -1,23 +1,87 @@
-let sideBar_width=$(".movieCategory").innerWidth();
-$(document).ready(function () {
-  $(".sideBar_content").animate({ left: `-${sideBar_width}` }, 0);
-});
-$(".toggle").click(function(){
-  if($(".sideBar_content").css("left")=="0px"){
-    let sideBar_width=$(".movieCategory").innerWidth();
-    $(".nav-item").slideUp(1000, function(){
-      $(".sideBar_content").animate({left:`-${sideBar_width}`},1000)
-      $(".toggle").removeClass("fa-xmark");
-      $(".toggle").addClass("fa-bars")
-  
-    })
-  }else{
-    $(".sideBar_content").animate({left:"0px"},1000,function(){
-      $(".toggle").addClass("fa-xmark");
-      $(".nav-item").slideDown(1000);
-    })
+// Responsive sidebar initialization
+let sideBar_width;
+
+function initSidebar() {
+  if (window.innerWidth >= 992) {
+    // Desktop behavior
+    sideBar_width = $(".movieCategory").innerWidth();
+    $(".sideBar_content").css({ left: `-${sideBar_width}px` });
+  } else {
+    // Mobile/Tablet behavior
+    $(".sideBar_content").css({ left: '-100vw' });
   }
-})
+}
+
+$(document).ready(function () {
+  initSidebar();
+});
+
+// Handle window resize
+$(window).resize(function() {
+  initSidebar();
+  // Close sidebar on resize to prevent layout issues
+  if ($(".sideBar_content").hasClass('show')) {
+    closeSidebar();
+  }
+});
+// Improved responsive sidebar toggle
+function openSidebar() {
+  if (window.innerWidth >= 992) {
+    // Desktop behavior
+    $(".sideBar_content").animate({left: "0px"}, 500, function(){
+      $(".toggle").removeClass("fa-bars").addClass("fa-xmark");
+      $(".nav-item").slideDown(500);
+    });
+  } else {
+    // Mobile/Tablet behavior with overlay
+    $(".sideBar_content").addClass('show').css({left: "0px"});
+    $("body").addClass('sidebar-open');
+    $(".toggle").removeClass("fa-bars").addClass("fa-xmark");
+    $(".nav-item").slideDown(300);
+  }
+}
+
+function closeSidebar() {
+  if (window.innerWidth >= 992) {
+    // Desktop behavior
+    $(".nav-item").slideUp(500, function(){
+      let width = $(".movieCategory").innerWidth();
+      $(".sideBar_content").animate({left: `-${width}px`}, 500);
+      $(".toggle").removeClass("fa-xmark").addClass("fa-bars");
+    });
+  } else {
+    // Mobile/Tablet behavior
+    $(".nav-item").slideUp(300, function(){
+      $(".sideBar_content").removeClass('show').css({left: "-100vw"});
+      $("body").removeClass('sidebar-open');
+      $(".toggle").removeClass("fa-xmark").addClass("fa-bars");
+    });
+  }
+}
+
+$(".toggle").click(function(){
+  if($(".sideBar_content").hasClass('show') || $(".sideBar_content").css("left") === "0px"){
+    closeSidebar();
+  } else {
+    openSidebar();
+  }
+});
+
+// Close sidebar when clicking outside on mobile
+$(document).click(function(event) {
+  if (window.innerWidth < 992 && $(".sideBar_content").hasClass('show')) {
+    if (!$(event.target).closest('.sideBar_content, .toggle').length) {
+      closeSidebar();
+    }
+  }
+});
+
+// Close sidebar on escape key
+$(document).keyup(function(e) {
+  if (e.keyCode === 27 && $(".sideBar_content").hasClass('show')) {
+    closeSidebar();
+  }
+});
 
 
 
@@ -35,14 +99,14 @@ function displayMovies(){
   let cartoona="";
   for(var i=0; i< movies.length ;i++ ){
     cartoona += `
-    <div class="col-md-6 col-lg-4 my-3 px-3">
+    <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 my-3 px-2 px-md-3">
                 <div class="movie position-relative overflow-hidden">
                     <img src="https://image.tmdb.org/t/p/w500${movies[i].poster_path}" class="img-fluid" alt="">
-                    <div class="layer text-center  position-absolute w-100 h-100 d-flex  flex-column justify-content-center align-items-center ">
-                        <h2>${movies[i].title}</h2>
-                        <p >${movies[i].overview}</p>
-                        <p> rate : ${movies[i].vote_average}</p>
-                        <p> ${movies[i].release_date}</p>
+                    <div class="layer text-center position-absolute w-100 h-100 d-flex flex-column justify-content-center align-items-center p-2">
+                        <h2 class="h5 h-md-4">${movies[i].title}</h2>
+                        <p class="small d-none d-md-block">${movies[i].overview}</p>
+                        <p class="mb-1">Rate: ${movies[i].vote_average}</p>
+                        <p class="small">${movies[i].release_date}</p>
                     </div>
                 </div>
             </div>
@@ -79,14 +143,14 @@ function search(term){
       if(movies[i]?.title.toLowerCase().includes(term.toLowerCase())==true)
       {
       cartoona += `
-      <div class="col-md-6 col-lg-4 my-3 px-3">
+      <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 my-3 px-2 px-md-3">
                   <div class="movie position-relative overflow-hidden">
                       <img src="https://image.tmdb.org/t/p/w500${movies[i].poster_path}" class="img-fluid" alt="">
-                      <div class="layer text-center  position-absolute w-100 h-100 d-flex  flex-column justify-content-center align-items-center ">
-                          <h2>${movies[i].title}</h2>
-                          <p >${movies[i].overview}</p>
-                          <p> rate : ${movies[i].vote_average}</p>
-                          <p> ${movies[i].release_date}</p>
+                      <div class="layer text-center position-absolute w-100 h-100 d-flex flex-column justify-content-center align-items-center p-2">
+                          <h2 class="h5 h-md-4">${movies[i].title}</h2>
+                          <p class="small d-none d-md-block">${movies[i].overview}</p>
+                          <p class="mb-1">Rate: ${movies[i].vote_average}</p>
+                          <p class="small">${movies[i].release_date}</p>
                       </div>
                   </div>
               </div>
@@ -207,6 +271,14 @@ userRePass.onkeyup = function () {
 };
 let contactUs = document.getElementById("inTouch");
 contactUs.addEventListener("click", function () {
-  let contactOffSet = $("#contactUs").offset().top;
-  $("html , body").animate({ scrollTop: contactOffSet }, 3000);
+  // Close sidebar first on mobile
+  if (window.innerWidth < 992 && $(".sideBar_content").hasClass('show')) {
+    closeSidebar();
+  }
+  
+  // Smooth scroll to contact section
+  setTimeout(() => {
+    let contactOffSet = $("#contactUs").offset().top;
+    $("html, body").animate({ scrollTop: contactOffSet }, 1500);
+  }, window.innerWidth < 992 ? 300 : 0);
 });
